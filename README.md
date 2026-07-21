@@ -1,8 +1,8 @@
-# HCXAI Impact Assessment Tool
+# AI Impact Assessment Tool (ISO42001 | ISO42005)
 
-**Self-contained HTML tool for conducting AI system impact assessments aligned to ISO/IEC 42001:2023 (Annex A.5) and structured on ISO/IEC 42005:2025 — with risk register, Annex A control mapping, and branded PDF/Markdown/HTML exports. No backend, no build step.**
+**Self-contained HTML tool for conducting AI system impact assessments aligned to ISO/IEC 42001:2023 (Annex A.5) and structured on ISO/IEC 42005:2025 - with risk register, Annex A control mapping, and branded PDF/Markdown/HTML exports. No backend, no build step.**
 
-Built by [HCXAIResearch](https://hcxairesearch.com) — *Human-at-centre AI governance*.
+Built by [HCXAIResearch](https://hcxairesearch.org)
 
 ---
 
@@ -71,7 +71,7 @@ version history and permissions provide the access control and audit trail.
 
 ## License & attribution
 
-© HCXAIResearch. Brand assets (logomark, wordmark, palette) are proprietary.
+© HCXAIResearch.org Brand assets (logomark, wordmark, palette) are proprietary.
 ISO/IEC standard titles and clause numbers are referenced for interoperability;
 the standards themselves are available from [iso.org](https://www.iso.org).
 
