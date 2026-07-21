@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI System Impact Assessment — HCXAIResearch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+  :root{
+    --navy:#1B2A4A; --navy-deep:#12203B; --teal:#2FB6B2; --teal-deep:#0E7C7B;
+    --ink:#1F2937; --muted:#6B7280; --line:#E5E7EB; --bg:#F6F8FA; --card:#FFFFFF;
+    --low:#0E7C7B; --med:#D97706; --high:#DC2626;
+    --radius:12px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.55}
+
+  /* ===== Header ===== */
+  header.app{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-deep) 60%,#0F2E3D 100%);color:#fff;padding:22px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .logomark{flex:0 0 auto}
+  .wordmark{font-family:'Poppins',sans-serif;font-size:22px;letter-spacing:.2px}
+  .wordmark .hcx{font-weight:800;color:#fff}
+  .wordmark .ai{font-weight:800;color:var(--teal)}
+  .wordmark .res{font-weight:300;color:#E4EAF2}
+  .app-title{margin-left:auto;text-align:right}
+  .app-title h1{font-family:'Poppins',sans-serif;font-weight:600;font-size:17px}
+  .app-title p{font-size:12.5px;color:#B9C6DA}
+  .tagline{font-size:11.5px;color:var(--teal);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+
+  /* ===== Toolbar ===== */
+  .toolbar{background:#fff;border-bottom:1px solid var(--line);padding:10px 28px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .toolbar .spacer{flex:1}
+  button{font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:8px 14px;cursor:pointer}
+  button:hover{border-color:var(--teal-deep);color:var(--teal-deep)}
+  button.primary{background:var(--teal-deep);border-color:var(--teal-deep);color:#fff}
+  button.primary:hover{background:#0B6362;color:#fff}
+  button:focus-visible{outline:3px solid rgba(47,182,178,.45);outline-offset:1px}
+  input[type=file]{display:none}
+
+  /* ===== Stepper ===== */
+  .stepper{position:sticky;top:0;z-index:20;background:#fff;border-bottom:2px solid var(--line);display:flex;overflow-x:auto;padding:0 16px}
+  .step{flex:1;min-width:118px;padding:12px 10px 10px;text-align:center;cursor:pointer;border-bottom:3px solid transparent;color:var(--muted)}
+  .step .n{display:inline-flex;width:22px;height:22px;border-radius:50%;border:2px solid currentColor;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;margin-bottom:3px}
+  .step .t{display:block;font-size:11.5px;font-weight:600;letter-spacing:.02em}
+  .step.active{color:var(--teal-deep);border-bottom-color:var(--teal-deep)}
+  .step.done{color:var(--navy)}
+  .step.done .n{background:var(--navy);border-color:var(--navy);color:#fff}
+
+  /* ===== Layout ===== */
+  main{max-width:1060px;margin:0 auto;padding:26px 20px 80px}
+  .stage{display:none}
+  .stage.visible{display:block}
+  .spine{background:linear-gradient(90deg,var(--navy),#173355);color:#fff;border-radius:var(--radius);padding:14px 18px;margin-bottom:18px}
+  .spine-row + .spine-row{margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.12)}
+  .spine .lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);font-weight:600}
+  .spine .lbl05{color:#9DB8E8}
+  .spine .codes{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .code{background:rgba(47,182,178,.16);border:1px solid rgba(47,182,178,.5);border-radius:6px;padding:2px 9px;font-size:12px;font-weight:600;color:#CFF3F1}
+  .code.c05{background:rgba(120,160,230,.14);border-color:rgba(140,175,235,.5);color:#D8E4F8}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin-bottom:16px}
+  .card h2{font-family:'Poppins',sans-serif;font-weight:600;font-size:17px;color:var(--navy);margin-bottom:4px}
+  .card .hint{font-size:13px;color:var(--muted);margin-bottom:16px}
+  label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin:14px 0 5px}
+  label .req{color:var(--high)}
+  input[type=text],input[type=date],select,textarea{width:100%;font-family:'Inter',sans-serif;font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+  textarea{min-height:84px;resize:vertical}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(47,182,178,.18)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+  @media(max-width:680px){.grid2{grid-template-columns:1fr}}
+  .navrow{display:flex;justify-content:space-between;margin-top:8px}
+
+  /* ===== Risk register ===== */
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:var(--navy);color:#fff;text-align:left;padding:9px 10px;font-weight:600;font-size:12px}
+  td{border-bottom:1px solid var(--line);padding:8px 10px;vertical-align:top}
+  td select,td input{font-size:13px;padding:6px 8px}
+  .pill{display:inline-block;border-radius:999px;padding:3px 11px;font-size:12px;font-weight:700;color:#fff;white-space:nowrap}
+  .pill.low{background:var(--low)}.pill.med{background:var(--med)}.pill.high{background:var(--high)}
+  .rm-del{border:none;background:none;color:var(--high);font-size:16px;cursor:pointer;padding:2px 6px}
+
+  /* ===== Outcome gate ===== */
+  .gate{border-radius:var(--radius);padding:18px 20px;border:1px solid var(--line);display:flex;gap:14px;align-items:flex-start}
+  .gate .dot{width:14px;height:14px;border-radius:50%;margin-top:4px;flex:0 0 auto}
+  .gate.low{background:#ECF7F6;border-color:#BFE5E3}.gate.low .dot{background:var(--low)}
+  .gate.med{background:#FEF6E9;border-color:#F5DDB4}.gate.med .dot{background:var(--med)}
+  .gate.high{background:#FDEDED;border-color:#F4C1C1}.gate.high .dot{background:var(--high)}
+  .gate strong{font-family:'Poppins',sans-serif}
+
+  /* ===== Controls checklist ===== */
+  details.ctrl-group{border:1px solid var(--line);border-radius:10px;margin-bottom:10px;background:#fff}
+  details.ctrl-group summary{cursor:pointer;padding:11px 14px;font-weight:600;color:var(--navy);font-size:14px;list-style:none;display:flex;justify-content:space-between;align-items:center}
+  details.ctrl-group summary::after{content:'+';color:var(--teal-deep);font-size:17px}
+  details[open].ctrl-group summary::after{content:'–'}
+  .ctrl-item{display:flex;gap:10px;padding:8px 16px;border-top:1px solid var(--line);align-items:flex-start;font-size:13.5px}
+  .ctrl-item input{margin-top:3px;accent-color:var(--teal-deep)}
+  .ctrl-item .cid{font-weight:700;color:var(--teal-deep);white-space:nowrap}
+  .count-badge{font-size:12px;font-weight:600;color:var(--teal-deep);background:#E7F5F4;border-radius:999px;padding:2px 10px;margin-right:8px}
+
+  /* ===== Summary ===== */
+  .kv{display:grid;grid-template-columns:220px 1fr;gap:6px 14px;font-size:13.5px}
+  .kv dt{font-weight:600;color:var(--muted)}
+  .kv dd{color:var(--ink)}
+  @media(max-width:600px){.kv{grid-template-columns:1fr}}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:11px 20px;border-radius:10px;font-size:13.5px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:50}
+  .toast.show{opacity:1}
+  @media(prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+
+<header class="app">
+  <svg class="logomark" width="46" height="46" viewBox="0 0 100 100" role="img" aria-label="HCXAIResearch logomark">
+    <!-- bracket-and-figure: brackets frame the system, the human sits at centre -->
+    <path d="M30 8 H10 V38" fill="none" stroke="#2FB6B2" stroke-width="9"/>
+    <path d="M70 8 H90 V38" fill="none" stroke="#2FB6B2" stroke-width="9"/>
+    <path d="M30 92 H10 V62" fill="none" stroke="#2FB6B2" stroke-width="9"/>
+    <path d="M70 92 H90 V62" fill="none" stroke="#2FB6B2" stroke-width="9"/>
+    <circle cx="50" cy="40" r="10" fill="#fff"/>
+    <path d="M32 74 a18 18 0 0 1 36 0" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
+  </svg>
+  <div>
+    <div class="wordmark"><span class="hcx">HCX</span><span class="ai">AI</span><span class="res">Research</span></div>
+    <div class="tagline">Human-at-centre AI governance</div>
+  </div>
+  <div class="app-title">
+    <h1>AI System Impact Assessment</h1>
+    <p>Aligned to ISO/IEC 42001:2023 (Annex A.5) · structured on ISO/IEC 42005:2025</p>
+  </div>
+</header>
+
+<div class="toolbar">
+  <button id="btnNew">New assessment</button>
+  <button id="btnLoad">Load JSON</button>
+  <input type="file" id="fileLoad" accept=".json,application/json">
+  <div class="spacer"></div>
+  <button id="btnSave">Save JSON snapshot</button>
+  <button id="btnMd">Export MD</button>
+  <button id="btnPdf">Export PDF</button>
+  <button id="btnReport" class="primary">Export report (HTML)</button>
+</div>
+
+<nav class="stepper" id="stepper" aria-label="Assessment stages"></nav>
+
+<main id="main"></main>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+'use strict';
+
+/* ============================================================
+   HCXAIResearch — AI System Impact Assessment (ISO/IEC 42001)
+   Single-file, client-side only. State lives in memory; persistence
+   is via JSON export/import (each export = a dated snapshot).
+   ============================================================ */
+
+var STAGES = [
+  { id:'profile',  title:'System profile',        codes:['Cl. 4.1','Cl. 4.2','A.9.4'],            codes05:['Cl. 5.4','Cl. 5.6','Cl. 6.2','Cl. 6.3'] },
+  { id:'purpose',  title:'Purpose & context',      codes:['A.9.4','A.6.2.2','A.9.2'],              codes05:['Cl. 6.3','Cl. 6.6'] },
+  { id:'people',   title:'Individuals & groups',   codes:['A.5.4'],                                codes05:['Cl. 6.7','Cl. 6.8','Annex C'] },
+  { id:'society',  title:'Societal impacts',       codes:['A.5.5'],                                codes05:['Cl. 6.8','Annex C'] },
+  { id:'misuse',   title:'Misuse & failure',       codes:['A.5.4','A.6.2.4','A.6.2.6'],            codes05:['Cl. 6.8'] },
+  { id:'risks',    title:'Risk register',          codes:['Cl. 6.1.2','Cl. 6.1.3','A.5.2'],        codes05:['Cl. 5.8','Cl. 5.9','Annex B'] },
+  { id:'controls', title:'Control mapping',        codes:['Annex A','Cl. 6.1.3 SoA'],              codes05:['Cl. 6.9','Annex A'] },
+  { id:'signoff',  title:'Outcome & sign-off',     codes:['A.5.3','Cl. 9.1','Cl. 5.3'],            codes05:['Cl. 5.10','Cl. 5.11','Cl. 5.12','Annex E'] }
+];
+
+/* ISO/IEC 42001:2023 Annex A control catalogue (deployer-relevant selection) */
+var CONTROLS = [
+  { g:'A.2 — Policies related to AI', items:[
+    ['A.2.2','AI policy'],['A.2.3','Alignment with other organizational policies'],['A.2.4','Review of the AI policy']]},
+  { g:'A.3 — Internal organization', items:[
+    ['A.3.2','AI roles and responsibilities'],['A.3.3','Reporting of concerns']]},
+  { g:'A.4 — Resources for AI systems', items:[
+    ['A.4.2','Resource documentation'],['A.4.3','Data resources'],['A.4.4','Tooling resources'],['A.4.5','System and computing resources'],['A.4.6','Human resources']]},
+  { g:'A.5 — Assessing impacts of AI systems', items:[
+    ['A.5.2','AI system impact assessment process'],['A.5.3','Documentation of AI system impact assessments'],['A.5.4','Assessing AI system impact on individuals or groups'],['A.5.5','Assessing societal impacts of AI systems']]},
+  { g:'A.6 — AI system life cycle', items:[
+    ['A.6.1.2','Objectives for responsible development'],['A.6.2.2','AI system requirements and specification'],['A.6.2.3','Documentation of AI system design and development'],['A.6.2.4','AI system verification and validation'],['A.6.2.5','AI system deployment'],['A.6.2.6','AI system operation and monitoring'],['A.6.2.7','AI system technical documentation'],['A.6.2.8','AI system recording of event logs']]},
+  { g:'A.7 — Data for AI systems', items:[
+    ['A.7.2','Data for development and enhancement of AI systems'],['A.7.3','Acquisition of data'],['A.7.4','Quality of data for AI systems'],['A.7.5','Data provenance'],['A.7.6','Data preparation']]},
+  { g:'A.8 — Information for interested parties', items:[
+    ['A.8.2','System documentation and information for users'],['A.8.3','External reporting'],['A.8.4','Communication of incidents'],['A.8.5','Information for interested parties']]},
+  { g:'A.9 — Use of AI systems', items:[
+    ['A.9.2','Processes for responsible use of AI systems'],['A.9.3','Objectives for responsible use'],['A.9.4','Intended use of the AI system']]},
+  { g:'A.10 — Third-party and customer relationships', items:[
+    ['A.10.2','Allocating responsibilities'],['A.10.3','Suppliers'],['A.10.4','Customers']]}
+];
+
+var LIKELIHOOD = ['1 — Rare','2 — Unlikely','3 — Possible','4 — Likely','5 — Almost certain'];
+var SEVERITY   = ['1 — Negligible','2 — Minor','3 — Moderate','4 — Major','5 — Severe'];
+
+function blankState(){
+  return {
+    meta:{ tool:'HCXAIResearch AI System Impact Assessment', standard:'ISO/IEC 42001:2023', version:'1.0', exported:null },
+    fields:{},           /* keyed textarea/input/select values */
+    risks:[],            /* {desc, affected, likelihood, severity} */
+    controls:[],         /* selected control ids */
+    current:0
+  };
+}
+var state = blankState();
+
+/* ---------- field definitions per stage ---------- */
+var FIELDS = {
+  profile:[
+    ['t','sysName','AI system name',1],
+    ['t','sysVersion','Version / release identifier',0],
+    ['t','vendor','Provider / vendor',0],
+    ['s','lifecycle','Lifecycle stage',1,['Design / procurement','Pre-deployment','Deployed — in operation','Significant change','Decommissioning']],
+    ['s','trigger','Assessment trigger',1,['New AI system','Significant change to system','New use case / context','Scheduled periodic review','Incident-driven review']],
+    ['t','owner','Business owner (accountable)',1],
+    ['d','date','Assessment date',1]
+  ],
+  purpose:[
+    ['a','purpose','Intended purpose of the AI system',1],
+    ['a','context','Context of use (deployment environment, sector, geography)',1],
+    ['a','users','Intended users and required competence',0],
+    ['a','limits','Known limitations and out-of-scope uses declared by the provider',0]
+  ],
+  people:[
+    ['a','individuals','Individuals directly affected (e.g., applicants, employees, patients)',1],
+    ['a','groups','Groups potentially affected differently (protected or vulnerable groups)',1],
+    ['a','benefits','Expected benefits to individuals and groups',0],
+    ['a','harms','Potential harms (rights, safety, economic, psychological, autonomy)',1],
+    ['a','redress','Transparency, contestability and redress available to affected persons',0]
+  ],
+  society:[
+    ['a','socBenefits','Expected societal benefits',0],
+    ['a','socHarms','Potential societal harms (environment, labour, information ecosystem, equity)',1],
+    ['a','scale','Scale and reversibility of societal effects',0]
+  ],
+  misuse:[
+    ['a','misuse','Reasonably foreseeable misuse',1],
+    ['a','failure','Failure modes and consequences of incorrect output',1],
+    ['a','oversight','Human oversight measures in place',1]
+  ],
+  signoff:[
+    ['t','assessor','Assessor (name, role)',1],
+    ['t','reviewer','Reviewer (name, role)',0],
+    ['t','approver','Approver — governance authority',0],
+    ['d','reviewDate','Next scheduled review date',1],
+    ['a','notes','Decision rationale and conditions',0]
+  ]
+};
+
+/* ---------- rendering ---------- */
+var stepperEl = document.getElementById('stepper');
+var mainEl = document.getElementById('main');
+
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function renderStepper(){
+  var html = '';
+  for (var i=0;i<STAGES.length;i++){
+    var cls = 'step' + (i===state.current?' active':'') + (i<state.current?' done':'');
+    html += '<div class="'+cls+'" data-i="'+i+'" role="button" tabindex="0"><span class="n">'+(i+1)+'</span><span class="t">'+esc(STAGES[i].title)+'</span></div>';
+  }
+  stepperEl.innerHTML = html;
+}
+
+function spine(stage){
+  var s = STAGES[stage];
+  var codes = s.codes.map(function(c){return '<span class="code">'+esc(c)+'</span>';}).join('');
+  var codes05 = (s.codes05||[]).map(function(c){return '<span class="code c05">'+esc(c)+'</span>';}).join('');
+  return '<div class="spine">'
+    + '<div class="spine-row"><span class="lbl">ISO/IEC 42001:2023 — requirements & controls</span><div class="codes">'+codes+'</div></div>'
+    + '<div class="spine-row"><span class="lbl lbl05">ISO/IEC 42005:2025 — impact assessment guidance</span><div class="codes">'+codes05+'</div></div>'
+    + '</div>';
+}
+
+function fieldHTML(def){
+  var kind=def[0], id=def[1], label=def[2], req=def[3];
+  var lab = '<label for="f_'+id+'">'+esc(label)+(req?' <span class="req">*</span>':'')+'</label>';
+  var val = esc(state.fields[id]||'');
+  if (kind==='t') return lab+'<input type="text" id="f_'+id+'" data-f="'+id+'" value="'+val+'">';
+  if (kind==='d') return lab+'<input type="date" id="f_'+id+'" data-f="'+id+'" value="'+val+'">';
+  if (kind==='a') return lab+'<textarea id="f_'+id+'" data-f="'+id+'">'+val+'</textarea>';
+  if (kind==='s'){
+    var opts = '<option value="">— Select —</option>';
+    for (var i=0;i<def[4].length;i++){
+      var o = def[4][i];
+      opts += '<option'+(state.fields[id]===o?' selected':'')+'>'+esc(o)+'</option>';
+    }
+    return lab+'<select id="f_'+id+'" data-f="'+id+'">'+opts+'</select>';
+  }
+  return '';
+}
+
+function riskScore(r){ return (Number(r.likelihood)||0) * (Number(r.severity)||0); }
+function riskBand(score){ if(score<=0) return null; if(score<=6) return 'low'; if(score<=12) return 'med'; return 'high'; }
+function bandLabel(b){ return b==='low'?'Low — proceed':(b==='med'?'Medium — proceed with controls':'High — escalate to governance authority'); }
+
+function overallBand(){
+  var worst = 0;
+  for (var i=0;i<state.risks.length;i++) worst = Math.max(worst, riskScore(state.risks[i]));
+  return riskBand(worst);
+}
+
+function gateHTML(){
+  var b = overallBand();
+  if (!b) return '<div class="gate"><div class="dot" style="background:#9CA3AF"></div><div><strong>No scored risks yet.</strong><br>Add risks with likelihood and severity to generate the assessment outcome.</div></div>';
+  return '<div class="gate '+b+'"><div class="dot"></div><div><strong>Assessment outcome: '+bandLabel(b)+'</strong><br>Derived from the highest-rated risk in the register (Cl. 6.1.2 risk criteria). High outcomes require approval before deployment or continued operation.</div></div>';
+}
+
+function renderStage(){
+  var s = STAGES[state.current];
+  var html = '<section class="stage visible">' + spine(state.current);
+
+  if (FIELDS[s.id]){
+    var intro = {
+      profile:'Identify the system, its lifecycle stage, and why this assessment is being performed. Assessments are triggered by new systems, significant changes, new contexts of use, or scheduled review.',
+      purpose:'Document intended purpose and context of use. Under ISO/IEC 42001, the same model in a different context of use is a separate assessment trigger.',
+      people:'Control A.5.4 — assess impacts on individuals and groups separately from societal impacts. Record from the deployer perspective: what you can observe and document.',
+      society:'Control A.5.5 — societal impacts are a distinct control from individual/group impacts and must be assessed in their own right.',
+      misuse:'Reasonably foreseeable misuse and failure modes inform verification, monitoring and oversight requirements.',
+      signoff:'Control A.5.3 — the assessment must be documented, with results retained and reported to relevant interested parties.'
+    }[s.id] || '';
+    html += '<div class="card"><h2>'+esc(s.title)+'</h2><p class="hint">'+esc(intro)+'</p>';
+    var defs = FIELDS[s.id];
+    var shortDefs = [], longDefs = [];
+    for (var i=0;i<defs.length;i++){ (defs[i][0]==='a'?longDefs:shortDefs).push(defs[i]); }
+    if (shortDefs.length){ html += '<div class="grid2">'; for (i=0;i<shortDefs.length;i++) html += '<div>'+fieldHTML(shortDefs[i])+'</div>'; html += '</div>'; }
+    for (i=0;i<longDefs.length;i++) html += fieldHTML(longDefs[i]);
+    html += '</div>';
+    if (s.id==='signoff') html += '<div class="card"><h2>Assessment outcome</h2><p class="hint">Auto-derived from the risk register.</p>'+gateHTML()+'</div>' + summaryCard();
+  }
+
+  if (s.id==='risks'){
+    html += '<div class="card"><h2>Risk register</h2><p class="hint">Convert documented impacts into risks (Cl. 6.1.2 / 6.1.3). Rating = likelihood × severity: 1–6 low, 8–12 medium, 15–25 high.</p>';
+    html += '<table><thead><tr><th style="width:34%">Risk / impact description</th><th style="width:20%">Affected parties</th><th>Likelihood</th><th>Severity</th><th>Rating</th><th></th></tr></thead><tbody>';
+    for (var r=0;r<state.risks.length;r++){
+      var rk = state.risks[r], sc = riskScore(rk), b = riskBand(sc);
+      html += '<tr>'
+        + '<td><input type="text" data-r="'+r+'" data-k="desc" value="'+esc(rk.desc)+'"></td>'
+        + '<td><input type="text" data-r="'+r+'" data-k="affected" value="'+esc(rk.affected)+'"></td>'
+        + '<td><select data-r="'+r+'" data-k="likelihood">'+scaleOpts(LIKELIHOOD,rk.likelihood)+'</select></td>'
+        + '<td><select data-r="'+r+'" data-k="severity">'+scaleOpts(SEVERITY,rk.severity)+'</select></td>'
+        + '<td>'+(b?'<span class="pill '+b+'">'+sc+'</span>':'<span style="color:var(--muted)">—</span>')+'</td>'
+        + '<td><button class="rm-del" data-del="'+r+'" title="Remove risk" aria-label="Remove risk">×</button></td>'
+        + '</tr>';
+    }
+    html += '</tbody></table><div style="margin-top:14px"><button id="addRisk" class="primary">+ Add risk</button></div></div>';
+    html += '<div class="card"><h2>Live outcome</h2>'+gateHTML()+'</div>';
+  }
+
+  if (s.id==='controls'){
+    html += '<div class="card"><h2>Annex A control mapping</h2><p class="hint">Select the controls that treat the identified risks. Selections feed your Statement of Applicability and link this assessment to the AIMS rather than leaving it standalone. <span class="count-badge">'+state.controls.length+' selected</span></p>';
+    for (var g=0; g<CONTROLS.length; g++){
+      var grp = CONTROLS[g];
+      var selCount = 0;
+      for (var c=0;c<grp.items.length;c++) if (state.controls.indexOf(grp.items[c][0])>-1) selCount++;
+      html += '<details class="ctrl-group"'+(selCount?' open':'')+'><summary>'+esc(grp.g)+(selCount?' <span class="count-badge">'+selCount+'</span>':'')+'</summary>';
+      for (c=0;c<grp.items.length;c++){
+        var it = grp.items[c], checked = state.controls.indexOf(it[0])>-1;
+        html += '<div class="ctrl-item"><input type="checkbox" id="c_'+it[0].replace(/\./g,'_')+'" data-c="'+it[0]+'"'+(checked?' checked':'')+'><label for="c_'+it[0].replace(/\./g,'_')+'" style="margin:0;font-weight:500;color:var(--ink)"><span class="cid">'+it[0]+'</span> '+esc(it[1])+'</label></div>';
+      }
+      html += '</details>';
+    }
+    html += '</div>';
+  }
+
+  html += '<div class="navrow">'
+    + (state.current>0 ? '<button id="prevBtn">← Back</button>' : '<span></span>')
+    + (state.current<STAGES.length-1 ? '<button id="nextBtn" class="primary">Continue →</button>' : '<button id="finishBtn" class="primary">Export report (HTML)</button>')
+    + '</div></section>';
+
+  mainEl.innerHTML = html;
+  renderStepper();
+  window.scrollTo(0,0);
+}
+
+function scaleOpts(scale, val){
+  var o = '<option value="">—</option>';
+  for (var i=0;i<scale.length;i++) o += '<option value="'+(i+1)+'"'+(Number(val)===i+1?' selected':'')+'>'+esc(scale[i])+'</option>';
+  return o;
+}
+
+function summaryCard(){
+  var f = state.fields, b = overallBand();
+  var rows = [
+    ['System', f.sysName], ['Version', f.sysVersion], ['Provider', f.vendor],
+    ['Lifecycle stage', f.lifecycle], ['Trigger', f.trigger],
+    ['Risks logged', String(state.risks.length)],
+    ['Controls mapped', String(state.controls.length)],
+    ['Outcome', b ? bandLabel(b) : 'Not yet scored']
+  ];
+  var kv = '';
+  for (var i=0;i<rows.length;i++) kv += '<dt>'+esc(rows[i][0])+'</dt><dd>'+esc(rows[i][1]||'—')+'</dd>';
+  return '<div class="card"><h2>Summary</h2><dl class="kv">'+kv+'</dl></div>';
+}
+
+/* ---------- events (delegated) ---------- */
+stepperEl.addEventListener('click', function(e){
+  var st = e.target.closest('.step');
+  if (st){ state.current = Number(st.getAttribute('data-i')); renderStage(); }
+});
+stepperEl.addEventListener('keydown', function(e){
+  if ((e.key==='Enter'||e.key===' ') && e.target.classList.contains('step')){ e.preventDefault(); state.current = Number(e.target.getAttribute('data-i')); renderStage(); }
+});
+
+mainEl.addEventListener('input', function(e){
+  var t = e.target;
+  if (t.hasAttribute('data-f')) state.fields[t.getAttribute('data-f')] = t.value;
+  if (t.hasAttribute('data-r')){
+    var r = Number(t.getAttribute('data-r')), k = t.getAttribute('data-k');
+    state.risks[r][k] = t.value;
+    if (k==='likelihood'||k==='severity') renderStage();
+  }
+});
+mainEl.addEventListener('change', function(e){
+  var t = e.target;
+  if (t.hasAttribute('data-c')){
+    var id = t.getAttribute('data-c'), ix = state.controls.indexOf(id);
+    if (t.checked && ix<0) state.controls.push(id);
+    if (!t.checked && ix>-1) state.controls.splice(ix,1);
+    renderStage();
+  }
+});
+mainEl.addEventListener('click', function(e){
+  var t = e.target;
+  if (t.id==='nextBtn'){ state.current++; renderStage(); }
+  if (t.id==='prevBtn'){ state.current--; renderStage(); }
+  if (t.id==='finishBtn'){ exportReport(); }
+  if (t.id==='addRisk'){ state.risks.push({desc:'',affected:'',likelihood:'',severity:''}); renderStage(); }
+  if (t.hasAttribute('data-del')){ state.risks.splice(Number(t.getAttribute('data-del')),1); renderStage(); }
+});
+
+/* ---------- toolbar ---------- */
+function toast(msg){
+  var el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 2600);
+}
+
+document.getElementById('btnNew').addEventListener('click', function(){
+  if (confirm('Start a new assessment? Unsaved entries will be lost.')){ state = blankState(); renderStage(); }
+});
+
+document.getElementById('btnSave').addEventListener('click', function(){
+  state.meta.exported = new Date().toISOString();
+  var name = (state.fields.sysName||'assessment').replace(/[^\w\-]+/g,'_');
+  downloadBlob(JSON.stringify(state,null,2), 'HCXAI_ImpactAssessment_'+name+'_'+state.meta.exported.slice(0,10)+'.json', 'application/json');
+  toast('Snapshot saved — store it in your controlled document library.');
+});
+
+document.getElementById('btnLoad').addEventListener('click', function(){ document.getElementById('fileLoad').click(); });
+document.getElementById('fileLoad').addEventListener('change', function(e){
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    try{
+      var data = JSON.parse(reader.result);
+      if (!data.fields || !data.risks) throw new Error('bad shape');
+      state = data;
+      if (typeof state.current !== 'number') state.current = 0;
+      renderStage();
+      toast('Assessment loaded.');
+    }catch(err){ toast('That file is not a valid assessment snapshot.'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+document.getElementById('btnReport').addEventListener('click', exportReport);
+
+/* Blob-based download — window.print() is blocked in sandboxed iframes,
+   so the report is a standalone HTML file with its own print button. */
+function downloadBlob(content, filename, type){
+  var blob = new Blob([content], {type:type});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+}
+
+/* ---------- report generation ---------- */
+function exportReport(){
+  var f = state.fields, b = overallBand();
+  var now = new Date().toISOString().slice(0,10);
+
+  function sec(title, code, rows){
+    var body = '';
+    for (var i=0;i<rows.length;i++){
+      if (rows[i][1]) body += '<div class="fld"><div class="fl">'+esc(rows[i][0])+'</div><div class="fv">'+esc(rows[i][1]).replace(/\n/g,'<br>')+'</div></div>';
+    }
+    if (!body) body = '<p class="none">Not documented.</p>';
+    return '<section><h2><span class="scode">'+esc(code)+'</span>'+esc(title)+'</h2>'+body+'</section>';
+  }
+
+  var riskRows = '';
+  for (var r=0;r<state.risks.length;r++){
+    var rk = state.risks[r], sc = riskScore(rk), rb = riskBand(sc);
+    riskRows += '<tr><td>'+esc(rk.desc||'—')+'</td><td>'+esc(rk.affected||'—')+'</td><td>'+esc(rk.likelihood||'—')+'</td><td>'+esc(rk.severity||'—')+'</td><td>'+(rb?'<span class="pill '+rb+'">'+sc+' — '+(rb==='low'?'Low':rb==='med'?'Medium':'High')+'</span>':'—')+'</td></tr>';
+  }
+  if (!riskRows) riskRows = '<tr><td colspan="5" class="none">No risks recorded.</td></tr>';
+
+  var ctrlRows = '';
+  for (var g=0; g<CONTROLS.length; g++){
+    for (var c=0;c<CONTROLS[g].items.length;c++){
+      var it = CONTROLS[g].items[c];
+      if (state.controls.indexOf(it[0])>-1) ctrlRows += '<tr><td class="cid">'+it[0]+'</td><td>'+esc(it[1])+'</td></tr>';
+    }
+  }
+  if (!ctrlRows) ctrlRows = '<tr><td colspan="2" class="none">No controls mapped.</td></tr>';
+
+  var gate = b
+    ? '<div class="gate '+b+'"><strong>Assessment outcome: '+esc(bandLabel(b))+'</strong></div>'
+    : '<div class="gate none"><strong>Assessment outcome: not scored</strong></div>';
+
+  var logo = '<svg width="40" height="40" viewBox="0 0 100 100"><path d="M30 8 H10 V38" fill="none" stroke="#2FB6B2" stroke-width="9"/><path d="M70 8 H90 V38" fill="none" stroke="#2FB6B2" stroke-width="9"/><path d="M30 92 H10 V62" fill="none" stroke="#2FB6B2" stroke-width="9"/><path d="M70 92 H90 V62" fill="none" stroke="#2FB6B2" stroke-width="9"/><circle cx="50" cy="40" r="10" fill="#fff"/><path d="M32 74 a18 18 0 0 1 36 0" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg>';
+
+  var html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>AI System Impact Assessment — '+esc(f.sysName||'Untitled')+'</title>'
+  + '<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">'
+  + '<style>'
+  + 'body{font-family:Inter,system-ui,sans-serif;color:#1F2937;margin:0;font-size:13.5px;line-height:1.55}'
+  + '.head{background:linear-gradient(135deg,#1B2A4A,#12203B 60%,#0F2E3D);color:#fff;padding:26px 34px;display:flex;align-items:center;gap:14px}'
+  + '.wm{font-family:Poppins,sans-serif;font-size:20px}.wm b{font-weight:800}.wm .ai{color:#2FB6B2;font-weight:800}.wm .res{font-weight:300;color:#E4EAF2}'
+  + '.tag{font-size:11px;color:#2FB6B2;text-transform:uppercase;letter-spacing:.08em}'
+  + '.head .rt{margin-left:auto;text-align:right}.head h1{font-family:Poppins,sans-serif;font-size:16px;font-weight:600;margin:0}'
+  + '.head p{margin:2px 0 0;font-size:12px;color:#B9C6DA}'
+  + 'main{max-width:860px;margin:0 auto;padding:26px 30px 60px}'
+  + 'section{margin-bottom:22px}'
+  + 'h2{font-family:Poppins,sans-serif;font-size:15px;color:#1B2A4A;border-bottom:2px solid #2FB6B2;padding-bottom:5px}'
+  + '.scode{display:inline-block;background:#E7F5F4;color:#0E7C7B;border-radius:5px;font-size:11px;font-weight:700;padding:2px 8px;margin-right:9px;vertical-align:middle}'
+  + '.fld{display:grid;grid-template-columns:230px 1fr;gap:4px 16px;padding:6px 0;border-bottom:1px solid #F0F2F5}'
+  + '.fl{font-weight:600;color:#6B7280}.fv{white-space:pre-wrap}'
+  + 'table{width:100%;border-collapse:collapse;font-size:12.5px}th{background:#1B2A4A;color:#fff;text-align:left;padding:7px 9px;font-size:11.5px}td{border-bottom:1px solid #E5E7EB;padding:7px 9px;vertical-align:top}'
+  + '.pill{border-radius:999px;padding:2px 10px;font-weight:700;color:#fff;font-size:11.5px;white-space:nowrap}.pill.low{background:#0E7C7B}.pill.med{background:#D97706}.pill.high{background:#DC2626}'
+  + '.cid{font-weight:700;color:#0E7C7B;white-space:nowrap}'
+  + '.gate{border-radius:10px;padding:14px 18px;margin:10px 0;font-size:14px}'
+  + '.gate.low{background:#ECF7F6;border:1px solid #BFE5E3}.gate.med{background:#FEF6E9;border:1px solid #F5DDB4}.gate.high{background:#FDEDED;border:1px solid #F4C1C1}.gate.none{background:#F3F4F6;border:1px solid #E5E7EB}'
+  + '.none{color:#9CA3AF;font-style:italic}'
+  + '.pbtn{position:fixed;top:14px;right:14px;background:#0E7C7B;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-family:Inter,sans-serif;font-weight:600;font-size:13px;cursor:pointer}'
+  + 'footer{border-top:1px solid #E5E7EB;margin-top:30px;padding-top:12px;font-size:11.5px;color:#6B7280}'
+  + '@media print{.pbtn{display:none}.head{-webkit-print-color-adjust:exact;print-color-adjust:exact}}'
+  + '</style></head><body>'
+  + '<button class="pbtn" onclick="window.print()">Print / Save as PDF</button>'
+  + '<div class="head">'+logo+'<div><div class="wm"><b>HCX</b><span class="ai">AI</span><span class="res">Research</span></div><div class="tag">Human-at-centre AI governance</div></div>'
+  + '<div class="rt"><h1>AI System Impact Assessment</h1><p>ISO/IEC 42001:2023 · Annex A.5 · generated '+now+'</p></div></div>'
+  + '<main>'
+  + gate
+  + sec('System profile','42001: Cl. 4.1, A.9.4 · 42005: Cl. 5.4, 5.6, 6.2, 6.3',[['AI system',f.sysName],['Version',f.sysVersion],['Provider / vendor',f.vendor],['Lifecycle stage',f.lifecycle],['Assessment trigger',f.trigger],['Business owner',f.owner],['Assessment date',f.date]])
+  + sec('Intended purpose & context of use','42001: A.9.4, A.6.2.2 · 42005: Cl. 6.3, 6.6',[['Intended purpose',f.purpose],['Context of use',f.context],['Intended users',f.users],['Declared limitations',f.limits]])
+  + sec('Impacts on individuals and groups','42001: A.5.4 · 42005: Cl. 6.7, 6.8, Annex C',[['Affected individuals',f.individuals],['Affected groups',f.groups],['Expected benefits',f.benefits],['Potential harms',f.harms],['Transparency & redress',f.redress]])
+  + sec('Societal impacts','42001: A.5.5 · 42005: Cl. 6.8, Annex C',[['Expected societal benefits',f.socBenefits],['Potential societal harms',f.socHarms],['Scale & reversibility',f.scale]])
+  + sec('Foreseeable misuse & failure','42001: A.5.4, A.6.2.4 · 42005: Cl. 6.8',[['Foreseeable misuse',f.misuse],['Failure modes',f.failure],['Human oversight',f.oversight]])
+  + '<section><h2><span class="scode">42001: Cl. 6.1.2, A.5.2 · 42005: Cl. 5.8, 5.9, Annex B</span>Risk register</h2><table><thead><tr><th>Risk description</th><th>Affected parties</th><th>L</th><th>S</th><th>Rating</th></tr></thead><tbody>'+riskRows+'</tbody></table></section>'
+  + '<section><h2><span class="scode">42001: Annex A · 42005: Cl. 6.9, Annex A</span>Control mapping ('+state.controls.length+' selected)</h2><table><thead><tr><th style="width:90px">Control</th><th>Title</th></tr></thead><tbody>'+ctrlRows+'</tbody></table></section>'
+  + sec('Outcome & sign-off','42001: A.5.3, Cl. 9.1 · 42005: Cl. 5.10–5.12, Annex E',[['Assessor',f.assessor],['Reviewer',f.reviewer],['Approver',f.approver],['Next review date',f.reviewDate],['Decision rationale & conditions',f.notes]])
+  + '<footer>HCXAIResearch — Human-at-centre AI governance. Assessment documented per ISO/IEC 42001:2023 control A.5.3; structured per ISO/IEC 42005:2025 (Cl. 5–6, Annexes A–C, E). Deployer-perspective record: reflects information reasonably available to the deploying organization.</footer>'
+  + '</main></body></html>';
+
+  var name = (f.sysName||'assessment').replace(/[^\w\-]+/g,'_');
+  downloadBlob(html, 'HCXAI_ImpactAssessment_Report_'+name+'_'+now+'.html', 'text/html');
+  toast('Report downloaded — open it and use its print button for PDF.');
+}
+
+/* ---------- Markdown export ----------
+   House conventions: YAML-compatible front matter, pipe tables,
+   inline code spans for provision codes, --- footer rule. */
+function mdEsc(s){ return String(s==null?'':s).replace(/\|/g,'\\|').replace(/\r?\n/g,' '); }
+
+function exportMarkdown(){
+  var f = state.fields, b = overallBand();
+  var now = new Date().toISOString().slice(0,10);
+  var L = [];
+
+  L.push('---');
+  L.push('title: "AI System Impact Assessment — ' + (f.sysName||'Untitled') + '"');
+  L.push('organization: "HCXAIResearch"');
+  L.push('standard: "ISO/IEC 42001:2023"');
+  L.push('guidance: "ISO/IEC 42005:2025"');
+  L.push('generated: "' + now + '"');
+  L.push('outcome: "' + (b ? bandLabel(b) : 'Not scored') + '"');
+  L.push('---');
+  L.push('');
+  L.push('# AI System Impact Assessment');
+  L.push('');
+  L.push('**HCXAIResearch** — *Human-at-centre AI governance*  ');
+  L.push('Aligned to `ISO/IEC 42001:2023` Annex A.5 · structured on `ISO/IEC 42005:2025` (Cl. 5–6, Annexes A–C, E)');
+  L.push('');
+  L.push('> **Assessment outcome:** ' + (b ? bandLabel(b) : 'Not scored'));
+  L.push('');
+
+  function mdSec(title, code, rows){
+    L.push('## ' + title + ' — `' + code + '`');
+    L.push('');
+    L.push('| Field | Entry |');
+    L.push('|---|---|');
+    for (var i=0;i<rows.length;i++) L.push('| ' + rows[i][0] + ' | ' + (mdEsc(rows[i][1])||'—') + ' |');
+    L.push('');
+  }
+
+  mdSec('System profile','42001: Cl. 4.1, A.9.4 · 42005: Cl. 5.4, 5.6, 6.2, 6.3',[['AI system',f.sysName],['Version',f.sysVersion],['Provider / vendor',f.vendor],['Lifecycle stage',f.lifecycle],['Assessment trigger',f.trigger],['Business owner',f.owner],['Assessment date',f.date]]);
+  mdSec('Intended purpose & context of use','42001: A.9.4, A.6.2.2 · 42005: Cl. 6.3, 6.6',[['Intended purpose',f.purpose],['Context of use',f.context],['Intended users',f.users],['Declared limitations',f.limits]]);
+  mdSec('Impacts on individuals and groups','42001: A.5.4 · 42005: Cl. 6.7, 6.8, Annex C',[['Affected individuals',f.individuals],['Affected groups',f.groups],['Expected benefits',f.benefits],['Potential harms',f.harms],['Transparency & redress',f.redress]]);
+  mdSec('Societal impacts','42001: A.5.5 · 42005: Cl. 6.8, Annex C',[['Expected societal benefits',f.socBenefits],['Potential societal harms',f.socHarms],['Scale & reversibility',f.scale]]);
+  mdSec('Foreseeable misuse & failure','42001: A.5.4, A.6.2.4 · 42005: Cl. 6.8',[['Foreseeable misuse',f.misuse],['Failure modes',f.failure],['Human oversight',f.oversight]]);
+
+  L.push('## Risk register — `42001: Cl. 6.1.2, A.5.2 · 42005: Cl. 5.8, 5.9, Annex B`');
+  L.push('');
+  L.push('| # | Risk description | Affected parties | L | S | Rating | Band |');
+  L.push('|---|---|---|---|---|---|---|');
+  if (state.risks.length){
+    for (var r=0;r<state.risks.length;r++){
+      var rk = state.risks[r], sc = riskScore(rk), rb = riskBand(sc);
+      L.push('| ' + (r+1) + ' | ' + (mdEsc(rk.desc)||'—') + ' | ' + (mdEsc(rk.affected)||'—') + ' | ' + (rk.likelihood||'—') + ' | ' + (rk.severity||'—') + ' | ' + (sc||'—') + ' | ' + (rb ? (rb==='low'?'Low':rb==='med'?'Medium':'High') : '—') + ' |');
+    }
+  } else L.push('| — | No risks recorded | — | — | — | — | — |');
+  L.push('');
+
+  L.push('## Control mapping — `42001: Annex A · 42005: Cl. 6.9, Annex A` (' + state.controls.length + ' selected)');
+  L.push('');
+  L.push('| Control | Title |');
+  L.push('|---|---|');
+  var any = false;
+  for (var g=0; g<CONTROLS.length; g++){
+    for (var c=0;c<CONTROLS[g].items.length;c++){
+      var it = CONTROLS[g].items[c];
+      if (state.controls.indexOf(it[0])>-1){ L.push('| `' + it[0] + '` | ' + it[1] + ' |'); any = true; }
+    }
+  }
+  if (!any) L.push('| — | No controls mapped |');
+  L.push('');
+
+  mdSec('Outcome & sign-off','42001: A.5.3, Cl. 9.1 · 42005: Cl. 5.10–5.12, Annex E',[['Assessor',f.assessor],['Reviewer',f.reviewer],['Approver',f.approver],['Next review date',f.reviewDate],['Decision rationale & conditions',f.notes]]);
+
+  L.push('---');
+  L.push('');
+  L.push('*HCXAIResearch — Human-at-centre AI governance. Documented per `A.5.3`; deployer-perspective record reflecting information reasonably available to the deploying organization.*');
+
+  var name = (f.sysName||'assessment').replace(/[^\w\-]+/g,'_');
+  downloadBlob(L.join('\n'), 'HCXAI_ImpactAssessment_'+name+'_'+now+'.md', 'text/markdown');
+  toast('Markdown exported.');
+}
+document.getElementById('btnMd').addEventListener('click', exportMarkdown);
+
+/* ---------- PDF export (jsPDF + autotable, brand-styled) ---------- */
+var NAVY = [27,42,74], TEAL = [47,182,178], TEAL_DEEP = [14,124,123], MUTED = [107,114,128];
+var BAND_COLORS = { low:[14,124,123], med:[217,119,6], high:[220,38,38] };
+
+function exportPdf(){
+  if (!(window.jspdf && window.jspdf.jsPDF)){ toast('PDF library not loaded — check your connection, or use the HTML report.'); return; }
+  var doc = new window.jspdf.jsPDF({unit:'mm', format:'a4'});
+  var f = state.fields, b = overallBand();
+  var now = new Date().toISOString().slice(0,10);
+  var W = 210, M = 16, y;
+
+  /* header band with logomark */
+  doc.setFillColor(NAVY[0],NAVY[1],NAVY[2]); doc.rect(0,0,W,34,'F');
+  /* bracket-and-figure mark, drawn as vector strokes */
+  var lx=M, ly=7, s=0.2; /* scale: 100-unit logo → 20mm */
+  doc.setDrawColor(TEAL[0],TEAL[1],TEAL[2]); doc.setLineWidth(1.8);
+  doc.line(lx+30*s,ly+8*s,lx+10*s,ly+8*s);  doc.line(lx+10*s,ly+8*s,lx+10*s,ly+38*s);
+  doc.line(lx+70*s,ly+8*s,lx+90*s,ly+8*s);  doc.line(lx+90*s,ly+8*s,lx+90*s,ly+38*s);
+  doc.line(lx+30*s,ly+92*s,lx+10*s,ly+92*s);doc.line(lx+10*s,ly+92*s,lx+10*s,ly+62*s);
+  doc.line(lx+70*s,ly+92*s,lx+90*s,ly+92*s);doc.line(lx+90*s,ly+92*s,lx+90*s,ly+62*s);
+  doc.setFillColor(255,255,255); doc.circle(lx+50*s,ly+40*s,10*s,'F');
+  doc.setDrawColor(255,255,255); doc.setLineWidth(1.8);
+  doc.lines([[36*s,0]],lx+32*s,ly+74*s); /* shoulder base */
+  doc.setLineWidth(1.6);
+  doc.ellipse(lx+50*s,ly+74*s,9*s,7*s,'S');
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(15);
+  doc.setTextColor(255,255,255); doc.text('HCX',M+24,15);
+  var w1 = doc.getTextWidth('HCX');
+  doc.setTextColor(TEAL[0],TEAL[1],TEAL[2]); doc.text('AI',M+24+w1,15);
+  var w2 = doc.getTextWidth('AI');
+  doc.setFont('helvetica','normal'); doc.setTextColor(228,234,242); doc.text('Research',M+24+w1+w2,15);
+  doc.setFontSize(7.5); doc.setTextColor(TEAL[0],TEAL[1],TEAL[2]);
+  doc.text('HUMAN-AT-CENTRE AI GOVERNANCE',M+24,20);
+  doc.setFontSize(12); doc.setTextColor(255,255,255); doc.setFont('helvetica','bold');
+  doc.text('AI System Impact Assessment',W-M,14,{align:'right'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(185,198,218);
+  doc.text('ISO/IEC 42001:2023 & ISO/IEC 42005:2025 · generated '+now,W-M,19.5,{align:'right'});
+
+  y = 42;
+
+  /* outcome gate */
+  var gateColor = b ? BAND_COLORS[b] : MUTED;
+  doc.setFillColor(gateColor[0],gateColor[1],gateColor[2]);
+  doc.roundedRect(M,y,W-2*M,10,2,2,'F');
+  doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(10);
+  doc.text('Assessment outcome: '+(b?bandLabel(b):'Not scored'),M+5,y+6.5);
+  y += 17;
+
+  function fieldTable(title, code, rows){
+    var body = [];
+    for (var i=0;i<rows.length;i++) body.push([rows[i][0], rows[i][1]||'—']);
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);
+    if (y > 262){ doc.addPage(); y = 20; }
+    doc.text(title,M,y);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(TEAL_DEEP[0],TEAL_DEEP[1],TEAL_DEEP[2]);
+    doc.text(code,W-M,y,{align:'right'});
+    doc.setDrawColor(TEAL[0],TEAL[1],TEAL[2]); doc.setLineWidth(0.6); doc.line(M,y+1.5,W-M,y+1.5);
+    doc.autoTable({
+      startY:y+4, margin:{left:M,right:M}, theme:'plain',
+      styles:{font:'helvetica',fontSize:8.5,cellPadding:1.6,textColor:[31,41,55],lineColor:[240,242,245],lineWidth:{bottom:0.2}},
+      columnStyles:{0:{cellWidth:52,fontStyle:'bold',textColor:MUTED}},
+      body:body
+    });
+    y = doc.lastAutoTable.finalY + 9;
+  }
+
+  fieldTable('System profile','42001: Cl. 4.1, A.9.4 · 42005: Cl. 5.4, 5.6, 6.2, 6.3',[['AI system',f.sysName],['Version',f.sysVersion],['Provider / vendor',f.vendor],['Lifecycle stage',f.lifecycle],['Assessment trigger',f.trigger],['Business owner',f.owner],['Assessment date',f.date]]);
+  fieldTable('Intended purpose & context of use','42001: A.9.4, A.6.2.2 · 42005: Cl. 6.3, 6.6',[['Intended purpose',f.purpose],['Context of use',f.context],['Intended users',f.users],['Declared limitations',f.limits]]);
+  fieldTable('Impacts on individuals and groups','42001: A.5.4 · 42005: Cl. 6.7, 6.8, Annex C',[['Affected individuals',f.individuals],['Affected groups',f.groups],['Expected benefits',f.benefits],['Potential harms',f.harms],['Transparency & redress',f.redress]]);
+  fieldTable('Societal impacts','42001: A.5.5 · 42005: Cl. 6.8, Annex C',[['Expected societal benefits',f.socBenefits],['Potential societal harms',f.socHarms],['Scale & reversibility',f.scale]]);
+  fieldTable('Foreseeable misuse & failure','42001: A.5.4, A.6.2.4 · 42005: Cl. 6.8',[['Foreseeable misuse',f.misuse],['Failure modes',f.failure],['Human oversight',f.oversight]]);
+
+  /* risk register */
+  if (y > 240){ doc.addPage(); y = 20; }
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);
+  doc.text('Risk register',M,y);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(TEAL_DEEP[0],TEAL_DEEP[1],TEAL_DEEP[2]);
+  doc.text('42001: Cl. 6.1.2, A.5.2 · 42005: Cl. 5.8, 5.9, Annex B',W-M,y,{align:'right'});
+  var riskBody = [];
+  for (var r=0;r<state.risks.length;r++){
+    var rk = state.risks[r], sc = riskScore(rk), rb = riskBand(sc);
+    riskBody.push([rk.desc||'—', rk.affected||'—', rk.likelihood||'—', rk.severity||'—', sc? sc+' — '+(rb==='low'?'Low':rb==='med'?'Medium':'High') : '—']);
+  }
+  if (!riskBody.length) riskBody.push(['No risks recorded','—','—','—','—']);
+  doc.autoTable({
+    startY:y+3, margin:{left:M,right:M},
+    head:[['Risk description','Affected parties','L','S','Rating']],
+    headStyles:{fillColor:NAVY,fontSize:8,fontStyle:'bold'},
+    styles:{font:'helvetica',fontSize:8.5,cellPadding:1.8},
+    columnStyles:{2:{cellWidth:10,halign:'center'},3:{cellWidth:10,halign:'center'},4:{cellWidth:28}},
+    body:riskBody,
+    didParseCell:function(data){
+      if (data.section==='body' && data.column.index===4){
+        var t = String(data.cell.raw);
+        var col = t.indexOf('High')>-1 ? BAND_COLORS.high : t.indexOf('Medium')>-1 ? BAND_COLORS.med : t.indexOf('Low')>-1 ? BAND_COLORS.low : null;
+        if (col){ data.cell.styles.textColor = col; data.cell.styles.fontStyle = 'bold'; }
+      }
+    }
+  });
+  y = doc.lastAutoTable.finalY + 9;
+
+  /* controls */
+  if (y > 240){ doc.addPage(); y = 20; }
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);
+  doc.text('Control mapping ('+state.controls.length+' selected)',M,y);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(TEAL_DEEP[0],TEAL_DEEP[1],TEAL_DEEP[2]);
+  doc.text('42001: Annex A · 42005: Cl. 6.9, Annex A',W-M,y,{align:'right'});
+  var ctrlBody = [];
+  for (var g=0; g<CONTROLS.length; g++){
+    for (var c=0;c<CONTROLS[g].items.length;c++){
+      var it = CONTROLS[g].items[c];
+      if (state.controls.indexOf(it[0])>-1) ctrlBody.push([it[0], it[1]]);
+    }
+  }
+  if (!ctrlBody.length) ctrlBody.push(['—','No controls mapped']);
+  doc.autoTable({
+    startY:y+3, margin:{left:M,right:M},
+    head:[['Control','Title']],
+    headStyles:{fillColor:NAVY,fontSize:8,fontStyle:'bold'},
+    styles:{font:'helvetica',fontSize:8.5,cellPadding:1.8},
+    columnStyles:{0:{cellWidth:24,fontStyle:'bold',textColor:TEAL_DEEP}},
+    body:ctrlBody
+  });
+  y = doc.lastAutoTable.finalY + 9;
+
+  fieldTable('Outcome & sign-off','42001: A.5.3, Cl. 9.1 · 42005: Cl. 5.10–5.12, Annex E',[['Assessor',f.assessor],['Reviewer',f.reviewer],['Approver',f.approver],['Next review date',f.reviewDate],['Decision rationale & conditions',f.notes]]);
+
+  /* footer on every page */
+  var pages = doc.getNumberOfPages();
+  for (var p=1;p<=pages;p++){
+    doc.setPage(p);
+    doc.setDrawColor(229,231,235); doc.setLineWidth(0.3); doc.line(M,286,W-M,286);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(MUTED[0],MUTED[1],MUTED[2]);
+    doc.text('HCXAIResearch — Human-at-centre AI governance · documented per A.5.3 (deployer-perspective record)',M,291);
+    doc.text('Page '+p+' of '+pages,W-M,291,{align:'right'});
+  }
+
+  var name = (f.sysName||'assessment').replace(/[^\w\-]+/g,'_');
+  doc.save('HCXAI_ImpactAssessment_'+name+'_'+now+'.pdf');
+  toast('PDF exported.');
+}
+document.getElementById('btnPdf').addEventListener('click', exportPdf);
+
+/* ---------- init ---------- */
+renderStage();
+</script>
+</body>
+</html>
