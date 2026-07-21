@@ -1,16 +1,14 @@
 # AI Impact Assessment Tool (ISO42001 | ISO42005)
 
-**Self-contained HTML tool for conducting AI system impact assessments aligned to ISO/IEC 42001:2023 (Annex A.5) and structured on ISO/IEC 42005:2025 - with risk register, Annex A control mapping, and branded PDF/Markdown/HTML exports. No backend, no build step.**
+**Self-contained HTML tool for conducting AI Impact Assessments (AIIA - pronounced "Aya"), aligned to ISO/IEC 42001:2023 (Annex A.5) and structured on ISO/IEC 42005:2025 - with risk register, Annex A control mapping, and branded PDF/Markdown/HTML exports.**
 
 Built by [HCXAIResearch](https://hcxairesearch.org)
 
----
-
 ## Why this exists
 
-Most AI impact assessment tooling assumes you built the model. This tool takes the **deployer perspective**: it captures what a deploying organization can realistically observe, document, and evidence — vendor-declared limitations, context of use, affected parties, oversight measures — rather than internal development details you'll never have.
+Most AI impact assessment tooling assumes you built the model. This tool takes the **deployer perspective**: it captures what a deploying organization can realistically observe, document, and evidence, vendor-declared limitations, context of use, affected parties, oversight measures, rather than internal development details you'll never have.
 
-It is a single HTML file. Email it, drop it on SharePoint, open it from a file share. No installation, no IT ticket, no data leaving the browser.
+It is a single HTML file. `Email it, drop it on SharePoint, open it from a file share`. **No installation, no data leaving the browser**.
 
 ## Features
 
