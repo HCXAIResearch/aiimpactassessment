@@ -77,4 +77,4 @@ the standards themselves are available from [iso.org](https://www.iso.org).
 
 ---
 
-*HCXAIResearch — Human-at-centre AI governance.*
+HCXAIResearch - Human Centered Explainable AI
