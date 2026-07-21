@@ -8,7 +8,8 @@ Built by [HCXAIResearch](https://hcxairesearch.org)
 
 Most AI impact assessment tooling assumes you built the model. This tool takes the **deployer perspective**: it captures what a deploying organization can realistically observe, document, and evidence, vendor-declared limitations, context of use, affected parties, oversight measures, rather than internal development details you'll never have.
 
-It is a single HTML file. `Email it, drop it on SharePoint, open it from a file share`. **No installation, no data leaving the browser**.
+It is a single HTML file. `Email it, drop it on SharePoint, open it from a file share`. **No installation, no data leaving the browser**. <br>
+> **Run Assessment:** https://hcxairesearch.github.io/aiimpactassessment/
 
 ## Features
 
