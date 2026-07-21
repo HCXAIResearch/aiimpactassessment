@@ -1,9 +1,7 @@
 # HCXAI Impact Assessment Tool — User Manual
 
-**Version 1.0 · HCXAIResearch — Human-at-centre AI governance**
+**Version 1.0 · HCXAIResearch - Human Centered AI governance**
 Aligned to `ISO/IEC 42001:2023` (Annex A.5) · structured on `ISO/IEC 42005:2025`
-
----
 
 ## Contents
 
